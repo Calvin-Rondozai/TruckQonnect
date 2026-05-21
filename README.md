@@ -1,50 +1,127 @@
-# Welcome to your Expo app 👋
+# TruckQonnect
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile logistics app for Zimbabwe, inspired by inDrive-style freight matching. **Cargo owners** post loads and hire drivers; **truck owners** browse loads, place bids, and run active deliveries with live map tracking.
 
-## Get started
+This repository is a **UI-first prototype**: mock data, local state, and no backend API yet.
 
-1. Install dependencies
+## Tech stack
 
-   ```bash
-   npm install
-   ```
+| Layer | Choice |
+|--------|--------|
+| Framework | [Expo](https://expo.dev) SDK 54 |
+| Language | TypeScript |
+| Navigation | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based) |
+| Maps | `react-native-maps` (fallback UI on web) |
+| Fonts | Poppins via `@expo-google-fonts/poppins` |
+| Storage | `@react-native-async-storage/async-storage` (role & profiles) |
 
-2. Start the app
+## Design
 
-   ```bash
-   npx expo start
-   ```
+Brand colors: **yellow** (`#F5D400` / `#F9C600`), **black**, and **white**.  
+Design tokens live in `constants/truckq-design.ts` (shipper) and `constants/owner-design.ts` (truck owner).
 
-In the output, you'll find options to open the app in a
+## Roles & features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Cargo owner (shipper)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Onboarding** → welcome → role selection → separate **Login** / **Sign Up** → OTP
+- **Tabs:** Home, Track, Chat, History, Requests
+- Post loads (`place-load`), view driver details, track shipments on a map
+- Profile editing and logout
+- Notification bell with in-app notification sheet
 
-## Get a fresh project
+### Truck owner (driver)
 
-When you're ready, run:
+- Same auth flow with role-specific signup (truck plate, brand, size, type)
+- **Tabs:** Home, **Track** (live navigation map), Loads, Chat, History, Profile
+- Browse loads, place bids; accepted bids open **Track** with pickup → dropoff route
+- Active delivery timeline, customer call/chat, truck info & settings
+- Logout returns to role selection
 
-```bash
-npm run reset-project
+## App flow
+
+```
+Splash → Onboarding → Welcome → Choose role → Login / Sign up → OTP → Main app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- **Cargo owner** lands on `/(tabs)`
+- **Truck owner** lands on `/(owner-tabs)`
 
-## Learn more
+## Getting started
 
-To learn more about developing your project with Expo, look at the following resources:
+From the `TruckQonnect` app directory (where `package.json` lives):
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install
+npx expo start
+```
 
-## Join the community
+Then open the project in:
 
-Join our community of developers creating universal apps.
+- **Expo Go** (iOS / Android)
+- **Android emulator** or **iOS simulator**
+- **Web** (`w` in the terminal) — maps use a static fallback on web
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Other scripts:
+
+```bash
+npm run android   # expo start --android
+npm run ios       # expo start --ios
+npm run web       # expo start --web
+npm run lint      # expo lint
+```
+
+## Demo credentials & tips
+
+| Item | Value |
+|------|--------|
+| OTP (mock) | `123456` |
+| After placing a bid | Alert offers **Open Track** — map shows pickup, truck position, and dropoff |
+| Active delivery | Pre-seeded on first load; new jobs are set when a bid is “accepted” in the UI |
+
+## Project structure
+
+```
+app/
+  (tabs)/          # Shipper bottom tabs
+  (owner-tabs)/    # Truck owner bottom tabs (includes Track)
+  owner/           # Owner stack: load details, bid, active delivery, chat, etc.
+  chat/            # Shipper chat threads
+  tracking/        # Shipper live tracking detail
+  driver/          # Shipper view of a driver
+  login.tsx, signup.tsx, forgot-password.tsx, otp.tsx, …
+
+components/
+  truckq/          # Shipper UI, auth, maps, notifications
+  owner/           # Truck owner UI, live map, track navigation
+
+context/           # User role, shipper profile, owner profile, active job, posted loads
+lib/               # Mock data, map styles, route coordinates
+constants/         # Design tokens
+assets/images/     # Logo, onboarding art
+```
+
+## Key routes
+
+| Route | Purpose |
+|-------|---------|
+| `/choose-role` | Cargo owner vs truck owner |
+| `/login`, `/signup` | Separate auth screens (role from query) |
+| `/forgot-password` | Password reset (mock) |
+| `/otp` | Phone verification |
+| `/(tabs)/track` | Shipper shipment list → tracking map |
+| `/(owner-tabs)/track` | Truck owner navigation map for active load |
+| `/owner/load/[id]` | Load details & bid entry |
+| `/tracking/[id]` | Shipper full-screen tracking map |
+
+## Roadmap (not implemented)
+
+- Real authentication and API
+- Push notifications
+- Payments and bid negotiation backend
+- Turn-by-turn navigation SDK integration
+- Persistent job history sync
+
+## License
+
+Private project — all rights reserved unless otherwise specified.
