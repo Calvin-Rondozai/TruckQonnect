@@ -116,10 +116,11 @@ assets/images/     # Logo, onboarding art
 
 ## Admin dashboard (HTML)
 
-A separate **premium operations dashboard** lives in [`admin/`](admin/):
+A separate **premium operations dashboard** lives in the parent [`Admin/`](../Admin/) folder (sibling to this mobile app):
 
 - **Stack:** HTML5, CSS3, Bootstrap 5, Chart.js, vanilla JavaScript (no React/backend)
-- **Start:** open `admin/login.html` in a browser, or run a static server from `admin/` (e.g. `npx serve admin`)
+- **Start:** open `Admin/login.html` in a browser, or run `npx serve Admin` from the repo root
+- **Logo:** `Admin/assets/images/logo.png.jpeg`
 - **Demo login:** any email/password → redirects to `dashboard.html`
 - **25 pages:** auth (login, forgot/reset password, OTP, lock screen) + dashboard, users, drivers, loads, tracking, payments, analytics, fraud monitoring, and more
 
