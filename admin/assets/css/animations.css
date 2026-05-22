@@ -1,0 +1,78 @@
+@keyframes gradientShift {
+  0% { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.92); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(249, 198, 0, 0.25); }
+  50% { box-shadow: 0 8px 32px rgba(249, 198, 0, 0.45); }
+}
+
+.tq-animate-in {
+  animation: fadeInUp 0.55s ease forwards;
+}
+
+.tq-animate-in-delay-1 { animation-delay: 0.08s; opacity: 0; }
+.tq-animate-in-delay-2 { animation-delay: 0.16s; opacity: 0; }
+.tq-animate-in-delay-3 { animation-delay: 0.24s; opacity: 0; }
+.tq-animate-in-delay-4 { animation-delay: 0.32s; opacity: 0; }
+
+.tq-float { animation: float 5s ease-in-out infinite; }
+.tq-float-slow { animation: floatSlow 7s ease-in-out infinite; }
+.tq-float-delay { animation-delay: 1.2s; }
+
+.tq-btn-glow { animation: glowPulse 3s ease infinite; }
+
+.tq-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tq-card-hover:hover {
+  transform: translateY(-2px);
+}
+
+.tq-skeleton {
+  background: linear-gradient(90deg, var(--tq-surface-2) 25%, var(--tq-surface) 50%, var(--tq-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

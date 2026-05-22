@@ -114,6 +114,15 @@ assets/images/     # Logo, onboarding art
 | `/owner/load/[id]` | Load details & bid entry |
 | `/tracking/[id]` | Shipper full-screen tracking map |
 
+## Admin dashboard (HTML)
+
+A separate **premium operations dashboard** lives in [`admin/`](admin/):
+
+- **Stack:** HTML5, CSS3, Bootstrap 5, Chart.js, vanilla JavaScript (no React/backend)
+- **Start:** open `admin/login.html` in a browser, or run a static server from `admin/` (e.g. `npx serve admin`)
+- **Demo login:** any email/password → redirects to `dashboard.html`
+- **25 pages:** auth (login, forgot/reset password, OTP, lock screen) + dashboard, users, drivers, loads, tracking, payments, analytics, fraud monitoring, and more
+
 ## Roadmap (not implemented)
 
 - Real authentication and API
