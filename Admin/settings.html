@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings — TruckQonnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/animations.css" rel="stylesheet">
+</head>
+<body class="tq-admin-shell" data-page-title="Settings">
+  <div class="tq-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="tq-sidebar" id="tqSidebar"></aside>
+  <div class="tq-main">
+    <header class="tq-topbar" id="tqTopbar"></header>
+    <div class="tq-content">
+      <div class="tq-page-header tq-animate-in">
+        <h1 class="tq-page-title">Settings</h1>
+        <p class="tq-page-sub">Branding, security, commissions, and platform config</p>
+      </div>
+      <div class="row g-3"><div class="col-lg-6"><div class="tq-card p-4"><h5>Branding</h5><label class="tq-form-label mt-2">Platform name</label><input class="tq-input" style="padding-left:1rem" value="TruckQonnect"><label class="tq-form-label mt-3">Primary color</label><input type="color" class="form-control form-control-color" value="#F9C600"></div></div>
+      <div class="col-lg-6"><div class="tq-card p-4"><h5>Commissions</h5><label class="tq-form-label mt-2">Platform fee %</label><input class="tq-input" style="padding-left:1rem" value="8"><label class="tq-form-label mt-3">Driver payout delay (days)</label><input class="tq-input" style="padding-left:1rem" value="2"></div></div>
+      <div class="col-12"><div class="tq-card p-4"><h5>Security</h5><div class="form-check form-switch"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">Require 2FA for admins</label></div><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">Session timeout (30 min)</label></div></div></div></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tables.js"></script>
+  
+</body>
+</html>

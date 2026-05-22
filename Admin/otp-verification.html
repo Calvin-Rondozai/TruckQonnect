@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verify OTP — TruckQonnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/animations.css" rel="stylesheet">
+</head>
+<body class="tq-auth-body">
+  <div class="tq-auth-panel" style="min-height:100vh">
+    <div class="tq-auth-card tq-animate-in text-center">
+      <div class="mb-3"><i class="bi bi-shield-lock-fill fs-1 text-warning"></i></div>
+      <h2 class="tq-brand-text mb-2">Two-factor verification</h2>
+      <p class="text-secondary small mb-4">Enter the 6-digit code sent to your device. Demo: <code>123456</code></p>
+      <form id="otpForm" class="text-start">
+        <div class="d-flex gap-2 justify-content-center mb-4">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="1">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="2">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="3">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="4">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="5">
+          <input class="tq-input text-center" style="width:48px;padding-left:0" maxlength="1" value="6">
+        </div>
+        <button type="submit" class="tq-btn-primary">Verify & continue</button>
+      </form>
+      <p class="small text-secondary mt-3 mb-0"><a href="#">Resend code</a> · <a href="login.html">Use different account</a></p>
+    </div>
+  </div>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

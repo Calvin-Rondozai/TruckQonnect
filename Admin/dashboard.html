@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — TruckQonnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/animations.css" rel="stylesheet">
+</head>
+<body class="tq-admin-shell" data-page-title="Dashboard" data-charts="dashboard">
+  <div class="tq-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="tq-sidebar" id="tqSidebar"></aside>
+  <div class="tq-main">
+    <header class="tq-topbar" id="tqTopbar"></header>
+    <div class="tq-content">
+      <div class="tq-page-header tq-animate-in">
+        <h1 class="tq-page-title">Operations overview</h1>
+        <p class="tq-page-sub">Real-time logistics metrics across Zimbabwe · Updated live</p>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3 tq-animate-in tq-animate-in-delay-1">
+          <div class="tq-kpi tq-card-hover">
+            <div class="d-flex justify-content-between"><span class="tq-kpi-label">Total users</span><span class="tq-kpi-icon"><i class="bi bi-people"></i></span></div>
+            <div class="tq-kpi-value" id="kpiUsers">—</div>
+            <span class="tq-kpi-trend up"><i class="bi bi-arrow-up-short"></i> 12.4% vs last month</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 tq-animate-in tq-animate-in-delay-2">
+          <div class="tq-kpi tq-card-hover">
+            <div class="d-flex justify-content-between"><span class="tq-kpi-label">Active drivers</span><span class="tq-kpi-icon"><i class="bi bi-truck"></i></span></div>
+            <div class="tq-kpi-value" id="kpiDrivers">—</div>
+            <span class="tq-kpi-trend up"><i class="bi bi-arrow-up-short"></i> 8.1%</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 tq-animate-in tq-animate-in-delay-3">
+          <div class="tq-kpi tq-card-hover">
+            <div class="d-flex justify-content-between"><span class="tq-kpi-label">Active loads</span><span class="tq-kpi-icon"><i class="bi bi-layers"></i></span></div>
+            <div class="tq-kpi-value" id="kpiLoads">—</div>
+            <span class="tq-kpi-trend up">326 open & in transit</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 tq-animate-in tq-animate-in-delay-4">
+          <div class="tq-kpi tq-card-hover">
+            <div class="d-flex justify-content-between"><span class="tq-kpi-label">Revenue (MTD)</span><span class="tq-kpi-icon"><i class="bi bi-currency-dollar"></i></span></div>
+            <div class="tq-kpi-value" id="kpiRevenue">—</div>
+            <span class="tq-kpi-trend up"><i class="bi bi-arrow-up-short"></i> 18.2%</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="tq-kpi tq-card-hover"><span class="tq-kpi-label">Ongoing trips</span><div class="tq-kpi-value" id="kpiTrips">—</div></div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="tq-kpi tq-card-hover"><span class="tq-kpi-label">Pending verifications</span><div class="tq-kpi-value" id="kpiVerify">—</div></div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="tq-kpi tq-card-hover"><span class="tq-kpi-label">Open disputes</span><div class="tq-kpi-value text-danger" id="kpiDisputes">—</div></div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+          <div class="tq-card tq-card-hover">
+            <div class="tq-card-header"><h3 class="tq-card-title">Revenue trend</h3></div>
+            <div class="tq-card-body"><div class="chart-container"><canvas id="chartRevenue"></canvas></div></div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="tq-card tq-card-hover">
+            <div class="tq-card-header"><h3 class="tq-card-title">Delivery volume</h3></div>
+            <div class="tq-card-body"><div class="chart-container tq-chart-sm"><canvas id="chartDeliveries"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+          <div class="tq-card">
+            <div class="tq-card-header"><h3 class="tq-card-title">Live fleet map</h3><span class="tq-badge tq-badge-warning">89 active</span></div>
+            <div class="tq-card-body p-0">
+              <div class="tq-map-placeholder" style="min-height:320px;border-radius:0;border:none">
+                <i class="bi bi-geo-alt fs-1 text-warning"></i>
+                <span>Interactive map · Harare corridor</span>
+                <small class="text-secondary">Truck positions update every 30s in production</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="tq-card h-100">
+            <div class="tq-card-header"><h3 class="tq-card-title">Activity feed</h3></div>
+            <div class="tq-card-body" id="activityFeed"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tq-card">
+        <div class="tq-card-header">
+          <h3 class="tq-card-title">Recent platform activity</h3>
+          <a href="system-logs.html" class="btn btn-sm btn-outline-secondary">View all logs</a>
+        </div>
+        <div class="tq-table-wrap">
+          <table class="tq-table">
+            <thead><tr><th>Event</th><th>Entity</th><th>Actor</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Load assigned</td><td>L-9001</td><td>System</td><td>2 min ago</td><td><span class="tq-badge tq-badge-success">OK</span></td></tr>
+              <tr><td>Payout queued</td><td>P-7782</td><td>Finance bot</td><td>34 min ago</td><td><span class="tq-badge tq-badge-warning">Pending</span></td></tr>
+              <tr><td>Driver verified</td><td>D-4403</td><td>Admin Calvin</td><td>1 hr ago</td><td><span class="tq-badge tq-badge-success">OK</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const k = TQMock.kpis;
+      document.getElementById('kpiUsers').textContent = k.totalUsers.toLocaleString();
+      document.getElementById('kpiDrivers').textContent = k.activeDrivers.toLocaleString();
+      document.getElementById('kpiLoads').textContent = k.activeLoads;
+      document.getElementById('kpiRevenue').textContent = '$' + k.revenue.toLocaleString();
+      document.getElementById('kpiTrips').textContent = k.ongoingTrips;
+      document.getElementById('kpiVerify').textContent = k.pendingVerifications;
+      document.getElementById('kpiDisputes').textContent = k.openDisputes;
+      document.getElementById('activityFeed').innerHTML = TQMock.activities.map(a => `
+        <div class="tq-activity-item">
+          <div class="tq-activity-icon" style="background:rgba(249,198,0,.15);color:var(--tq-yellow)"><i class="bi bi-${a.icon}"></i></div>
+          <div><div class="small fw-semibold">${a.text}</div><div class="text-secondary" style="font-size:.75rem">${a.time}</div></div>
+        </div>`).join('');
+    });
+  </script>
+</body>
+</html>

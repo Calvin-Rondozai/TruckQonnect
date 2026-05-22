@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cargo Owners — TruckQonnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/animations.css" rel="stylesheet">
+</head>
+<body class="tq-admin-shell" data-page-title="Cargo Owners">
+  <div class="tq-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="tq-sidebar" id="tqSidebar"></aside>
+  <div class="tq-main">
+    <header class="tq-topbar" id="tqTopbar"></header>
+    <div class="tq-content">
+      <div class="tq-page-header tq-animate-in">
+        <h1 class="tq-page-title">Cargo Owners</h1>
+        <p class="tq-page-sub">Shippers posting loads and spend analytics</p>
+      </div>
+      <div class="tq-card"><div class="tq-table-wrap"><table class="tq-table" id="dataTable"><thead><tr><th>ID</th><th>Name</th><th>Company</th><th>Loads</th><th>Spent</th><th>Rating</th><th>Status</th></tr></thead><tbody id="cargoBody"></tbody></table></div></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tables.js"></script>
+  
+</body>
+</html>
+  <script>document.addEventListener('DOMContentLoaded',()=>{document.getElementById('cargoBody').innerHTML=TQMock.cargoOwners.map(c=>'<tr><td><code>'+c.id+'</code></td><td>'+c.name+'</td><td>'+c.company+'</td><td>'+c.loads+'</td><td>$'+c.spent.toLocaleString()+'</td><td>'+c.rating+'</td><td>'+TQTables.statusBadge(c.status)+'</td></tr>').join('');});</script>
