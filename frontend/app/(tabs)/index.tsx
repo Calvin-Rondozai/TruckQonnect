@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BoxImage } from '@/components/truckq/BoxImage';
+import { HomeAppBar } from '@/components/truckq/HomeAppBar';
 import { NotificationsPanel } from '@/components/truckq/NotificationsPanel';
-import { PackageStackIllustration } from '@/components/truckq/PackageStackIllustration';
-import { ProfileAvatar } from '@/components/truckq/ProfileAvatar';
+import { ShipmentCard } from '@/components/truckq/ShipmentCard';
 import { ProgressWithTruck } from '@/components/truckq/ProgressWithTruck';
 import { useAuthUser } from '@/context/auth-user';
 import { MOCK_NOTIFICATIONS } from '@/lib/shipper-mock-data';
@@ -21,17 +22,38 @@ import { usePostedLoads } from '@/context/posted-loads';
 import { TQ, TQFonts, TQRadii } from '@/constants/truckq-design';
 
 const RECENT = [
-  { id: '1', code: '#K91M220441', date: 'May 18 · Bulawayo', status: 'In Transit' as const },
-  { id: '2', code: '#P44L998201', date: 'May 12 · Mutare', status: 'Delivered' as const },
-  { id: '3', code: '#T09Q112903', date: 'May 09 · Harare', status: 'Scheduled' as const },
+  {
+    id: '1',
+    code: '#K91M220441',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 18, 2026',
+    route: 'Harare → Bulawayo',
+    status: 'In Transit' as const,
+  },
+  {
+    id: '2',
+    code: '#P44L998201',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 12, 2026',
+    route: 'Mutare → Harare',
+    status: 'Delivered' as const,
+  },
+  {
+    id: '3',
+    code: '#T09Q112903',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 09, 2026',
+    route: 'Harare → Kadoma',
+    status: 'Scheduled' as const,
+  },
 ];
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, displayAvatar } = useAuthUser();
+  const { user } = useAuthUser();
   const { loads: postedLoads } = usePostedLoads();
-  const firstName = (user?.full_name ?? 'Guest').split(' ')[0];
+  const companyLabel = user?.company ?? 'Your company';
   const openLoads = postedLoads.filter((l) => l.status === 'open');
   const [notifOpen, setNotifOpen] = useState(false);
   const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
@@ -43,38 +65,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
       >
-        <View style={styles.topRow}>
-          <Pressable
-            style={({ pressed }) => [styles.profileBlock, pressed && { opacity: 0.88 }]}
-            onPress={() => router.push('/(tabs)/profile' as const)}
-            accessibilityRole="button"
-            accessibilityLabel="Edit your profile"
-          >
-            <ProfileAvatar uri={displayAvatar} size={48} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.hey}>Hey {firstName}</Text>
-              {user?.company ? (
-                <Text style={styles.company} numberOfLines={1}>
-                  {user.company}
-                </Text>
-              ) : null}
-            </View>
-            <Feather name="chevron-right" size={20} color={TQ.gray400} />
-          </Pressable>
-          <Pressable
-            style={styles.notif}
-            accessibilityRole="button"
-            accessibilityLabel="Notifications"
-            onPress={() => setNotifOpen(true)}
-          >
-            <Feather name="bell" size={20} color={TQ.black} />
-            {unreadCount > 0 ? (
-              <View style={styles.notifBadge}>
-                <Text style={styles.notifBadgeText}>{unreadCount}</Text>
-              </View>
-            ) : null}
-          </Pressable>
-        </View>
+        <HomeAppBar unreadCount={unreadCount} onNotificationsPress={() => setNotifOpen(true)} />
 
         <Pressable
           style={({ pressed }) => [styles.search, pressed && { opacity: 0.92 }]}
@@ -114,24 +105,27 @@ export default function HomeScreen() {
           <>
             <Text style={[styles.sectionLabel, { marginTop: 6 }]}>Your open loads</Text>
             {openLoads.slice(0, 3).map((load) => (
-              <Pressable
+              <ShipmentCard
                 key={load.id}
-                style={({ pressed }) => [styles.openLoadCard, pressed && { opacity: 0.92 }]}
-                onPress={() => router.push('/(tabs)/requests' as const)}
-              >
-                <View style={styles.openLoadTop}>
-                  <Text style={styles.openLoadCode}>{load.code}</Text>
-                  <View style={styles.awaitingBadge}>
-                    <Text style={styles.awaitingText}>Awaiting bids</Text>
-                  </View>
-                </View>
-                <Text style={styles.openLoadRoute}>
-                  {load.pickup} → {load.delivery}
-                </Text>
-                <Text style={styles.openLoadMeta} numberOfLines={1}>
-                  {load.description} · {load.budget}
-                </Text>
-              </Pressable>
+                boxWidth={64}
+                style={{ marginBottom: 10 }}
+                data={{
+                  code: load.code,
+                  companyName: companyLabel,
+                  deliveryDate: load.pickupWhen || new Date(load.postedAt).toLocaleDateString(),
+                  route: `${load.pickup} → ${load.delivery}`,
+                  status: 'Awaiting bids',
+                  subtitle: `${load.description} · ${load.budget}`,
+                }}
+                onPress={() =>
+                  load.shipmentLoadId
+                    ? router.push({
+                        pathname: '/tracking/[id]',
+                        params: { id: load.shipmentLoadId },
+                      })
+                    : router.push('/(tabs)/requests' as const)
+                }
+              />
             ))}
           </>
         ) : null}
@@ -151,13 +145,15 @@ export default function HomeScreen() {
           <View style={styles.heroTop}>
             <View style={{ flex: 1 }}>
               <Text style={styles.trackId}>#H62J568107</Text>
-              <Text style={styles.heroLoc}>En route · Harare → Chitungwiza</Text>
+              <Text style={styles.heroCompany}>{companyLabel}</Text>
+              <Text style={styles.heroDate}>Delivery · May 20, 2026</Text>
+              <Text style={styles.heroLoc}>Harare → Chitungwiza</Text>
               <View style={styles.statusPill}>
                 <View style={styles.dot} />
                 <Text style={styles.statusText}>In transit</Text>
               </View>
             </View>
-            <PackageStackIllustration />
+            <BoxImage width={76} />
           </View>
           <ProgressWithTruck progress={0.62} />
         </Pressable>
@@ -170,39 +166,24 @@ export default function HomeScreen() {
         </View>
 
         {RECENT.map((item) => (
-          <Pressable
+          <ShipmentCard
             key={item.id}
-            style={({ pressed }) => [styles.listCard, pressed && { opacity: 0.92 }]}
+            boxWidth={64}
+            style={{ marginBottom: 10 }}
+            data={{
+              code: item.code,
+              companyName: item.companyName,
+              deliveryDate: item.deliveryDate,
+              route: item.route,
+              status: item.status,
+            }}
             onPress={() =>
               router.push({
                 pathname: '/driver/[id]',
                 params: { id: item.code.replace('#', '') },
               })
             }
-          >
-            <View style={styles.listRow}>
-              <View style={{ flex: 1 }}>
-                <View
-                  style={[
-                    styles.miniBadge,
-                    item.status === 'Delivered' && { backgroundColor: TQ.greenSoft },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.miniBadgeText,
-                      item.status === 'Delivered' && { color: TQ.green },
-                    ]}
-                  >
-                    {item.status}
-                  </Text>
-                </View>
-                <Text style={styles.listCode}>{item.code}</Text>
-                <Text style={styles.listDate}>{item.date}</Text>
-              </View>
-              <PackageStackIllustration size="sm" />
-            </View>
-          </Pressable>
+          />
         ))}
       </ScrollView>
     </View>
@@ -215,82 +196,17 @@ const styles = StyleSheet.create({
     backgroundColor: TQ.gray100,
     paddingHorizontal: 20,
   },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 18,
-  },
-  profileBlock: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginRight: 10,
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    borderColor: TQ.white,
-    backgroundColor: TQ.gray200,
-  },
-  hey: {
-    fontFamily: TQFonts.semiBold,
-    fontSize: 18,
-    color: TQ.ink,
-  },
-  locRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  loc: {
-    fontFamily: TQFonts.medium,
-    fontSize: 13,
-    color: TQ.gray500,
-  },
-  company: {
+  heroCompany: {
     marginTop: 4,
     fontFamily: TQFonts.medium,
     fontSize: 13,
+    color: TQ.gray600,
+  },
+  heroDate: {
+    marginTop: 2,
+    fontFamily: TQFonts.regular,
+    fontSize: 12,
     color: TQ.gray500,
-  },
-  notif: {
-    width: 48,
-    height: 48,
-    borderRadius: TQRadii.md,
-    backgroundColor: TQ.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: TQ.gray200,
-    shadowColor: TQ.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  notifBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: TQ.yellow,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 1.5,
-    borderColor: TQ.white,
-  },
-  notifBadgeText: {
-    fontFamily: TQFonts.bold,
-    fontSize: 10,
-    color: TQ.black,
   },
   search: {
     flexDirection: 'row',

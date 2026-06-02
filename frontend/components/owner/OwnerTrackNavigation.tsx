@@ -6,10 +6,15 @@ import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OwnerLiveMap } from '@/components/owner/OwnerLiveMap';
+import { LoadTrackingMap } from '@/components/truckq/LoadTrackingMap';
 import { Avatar, OwnerButton } from '@/components/owner/OwnerUIKit';
 import { OW, TQFonts, TQRadii } from '@/constants/owner-design';
+import { useDriverLocationBroadcast } from '@/hooks/useDriverLocationBroadcast';
+import { useLoadTracking } from '@/hooks/useLoadTracking';
+import { isShipmentLoadId } from '@/lib/load-id';
 import type { ActiveDelivery } from '@/lib/owner-types';
 import { getRouteForLoad } from '@/lib/owner-routes';
+import { normalizeLoadId } from '@/lib/loads-api';
 
 type Props = {
   delivery: ActiveDelivery;
@@ -19,16 +24,37 @@ type Props = {
 
 export function OwnerTrackNavigation({ delivery, showBack = false, onBack }: Props) {
   const insets = useSafeAreaInsets();
-  const route = getRouteForLoad(delivery.loadId);
+  const mockRoute = getRouteForLoad(delivery.loadId);
+  const apiLoadId = isShipmentLoadId(delivery.loadId) ? normalizeLoadId(delivery.loadId) : null;
+  const { route: apiRoute, truck, region, loading } = useLoadTracking(apiLoadId, true);
+  useDriverLocationBroadcast(apiLoadId, Boolean(apiLoadId));
 
   const handleBack = () => {
     if (onBack) onBack();
     else router.back();
   };
 
+  const useApiMap = Boolean(apiLoadId && apiRoute && region);
+
   return (
     <View style={styles.root}>
-      <OwnerLiveMap fullScreen route={route} />
+      {useApiMap ? (
+        <LoadTrackingMap
+          fullScreen
+          pickup={apiRoute.pickup}
+          destination={apiRoute.destination}
+          truck={truck}
+          routePolyline={apiRoute.route.polyline}
+          region={region}
+        />
+      ) : (
+        <OwnerLiveMap fullScreen route={mockRoute} />
+      )}
+      {apiLoadId && loading && !apiRoute ? (
+        <View style={styles.mapOverlay}>
+          <Text style={styles.mapOverlayText}>Loading route…</Text>
+        </View>
+      ) : null}
 
       <LinearGradient
         colors={['rgba(255,255,255,0.97)', 'rgba(255,255,255,0.85)', 'transparent']}
@@ -132,6 +158,13 @@ export function OwnerTrackNavigation({ delivery, showBack = false, onBack }: Pro
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: OW.bg },
+  mapOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  mapOverlayText: { fontFamily: TQFonts.medium, fontSize: 14, color: OW.gray500 },
   headerFade: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 },
   header: {
     position: 'absolute',

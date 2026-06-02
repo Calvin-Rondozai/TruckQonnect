@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { OwnerScreen, StatusBadge } from '@/components/owner/OwnerUIKit';
+import { OwnerScreen } from '@/components/owner/OwnerUIKit';
+import { ShipmentCard } from '@/components/truckq/ShipmentCard';
 import { OW, TQFonts, TQRadii } from '@/constants/owner-design';
 import { OWNER_HISTORY } from '@/lib/owner-mock-data';
 import type { OwnerHistoryItem } from '@/lib/owner-types';
@@ -41,40 +42,45 @@ export default function OwnerHistoryScreen() {
 }
 
 function HistoryCard({ item }: { item: OwnerHistoryItem }) {
-  const tone = item.status === 'completed' ? 'green' : item.status === 'cancelled' ? 'red' : 'yellow';
+  const statusLabel =
+    item.status === 'completed' ? 'Delivered' : item.status === 'cancelled' ? 'Cancelled' : 'Ongoing';
+
   return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <Text style={styles.cargo}>{item.cargoType}</Text>
-        <StatusBadge label={item.status} tone={tone} />
-      </View>
-      <Text style={styles.route}>{item.pickup} → {item.dropoff}</Text>
-      <View style={styles.cardFoot}>
-        <Text style={styles.earn}>${item.earnings}</Text>
-        <Text style={styles.date}>{item.date}</Text>
-        <Text style={styles.rating}>★ {item.customerRating}</Text>
-      </View>
-      {item.status === 'ongoing' ? (
-        <Pressable
-          onPress={() =>
-            router.push({
-              pathname: '/owner/active-delivery/[id]',
-              params: { id: 'delivery-1' },
-            })
-          }
-        >
-          <Text style={styles.track}>Track delivery →</Text>
-        </Pressable>
-      ) : item.status === 'completed' ? (
-        <Pressable
-          onPress={() =>
-            router.push({ pathname: '/owner/completed/[id]', params: { id: item.id } })
-          }
-        >
-          <Text style={styles.track}>View summary →</Text>
-        </Pressable>
-      ) : null}
-    </View>
+    <ShipmentCard
+      boxWidth={64}
+      style={{ marginBottom: 12 }}
+      data={{
+        code: `#${item.id.toUpperCase()}`,
+        companyName: item.customerCompany,
+        deliveryDate: item.deliveryDate,
+        route: `${item.pickup} → ${item.dropoff}`,
+        status: statusLabel,
+        subtitle: item.cargoType,
+        amount: `$${item.earnings}`,
+      }}
+      footer={
+        item.status === 'ongoing' ? (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: '/owner/active-delivery/[id]',
+                params: { id: 'delivery-1' },
+              })
+            }
+          >
+            <Text style={styles.track}>Track delivery →</Text>
+          </Pressable>
+        ) : item.status === 'completed' ? (
+          <Pressable
+            onPress={() =>
+              router.push({ pathname: '/owner/completed/[id]', params: { id: item.id } })
+            }
+          >
+            <Text style={styles.track}>View summary →</Text>
+          </Pressable>
+        ) : null
+      }
+    />
   );
 }
 
@@ -82,19 +88,18 @@ const styles = StyleSheet.create({
   head: { padding: 20 },
   title: { fontFamily: TQFonts.bold, fontSize: 24, color: OW.black },
   tabs: { flexDirection: 'row', paddingHorizontal: 20, gap: 8, marginBottom: 12 },
-  tab: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: TQRadii.pill, backgroundColor: OW.white, borderWidth: 1, borderColor: OW.gray200 },
+  tab: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: TQRadii.pill,
+    backgroundColor: OW.white,
+    borderWidth: 1,
+    borderColor: OW.gray200,
+  },
   tabOn: { backgroundColor: OW.yellow, borderColor: OW.yellow },
   tabText: { fontFamily: TQFonts.medium, fontSize: 13, color: OW.gray500 },
   tabTextOn: { fontFamily: TQFonts.bold, color: OW.black },
   list: { paddingHorizontal: 20, paddingBottom: 24 },
   empty: { textAlign: 'center', fontFamily: TQFonts.regular, color: OW.gray500, marginTop: 40 },
-  card: { backgroundColor: OW.white, borderRadius: TQRadii.lg, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: OW.gray200 },
-  cardTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  cargo: { fontFamily: TQFonts.bold, fontSize: 15, color: OW.black },
-  route: { fontFamily: TQFonts.regular, fontSize: 13, color: OW.gray500 },
-  cardFoot: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 },
-  earn: { fontFamily: TQFonts.bold, fontSize: 18, color: OW.black },
-  date: { fontFamily: TQFonts.regular, fontSize: 12, color: OW.gray500, flex: 1 },
-  rating: { fontFamily: TQFonts.semiBold, fontSize: 12, color: OW.yellowDeep },
-  track: { fontFamily: TQFonts.semiBold, fontSize: 13, color: OW.yellowDeep, marginTop: 10 },
+  track: { fontFamily: TQFonts.semiBold, fontSize: 13, color: OW.yellowDeep, marginTop: 4 },
 });

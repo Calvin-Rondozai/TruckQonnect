@@ -1,31 +1,74 @@
-import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { TQ, TQFonts, TQRadii } from '@/constants/truckq-design';
+import { ShipmentCard } from '@/components/truckq/ShipmentCard';
+import { useAuthUser } from '@/context/auth-user';
+import { TQ, TQFonts } from '@/constants/truckq-design';
 
-type Item = { id: string; code: string; lane: string; amount: string; outcome: 'Delivered' | 'Cancelled' };
+type Item = {
+  id: string;
+  code: string;
+  companyName: string;
+  deliveryDate: string;
+  route: string;
+  amount: string;
+  outcome: 'Delivered' | 'Cancelled';
+};
 
 const SECTIONS: { title: string; data: Item[] }[] = [
   {
     title: 'May 2026',
     data: [
-      { id: '1', code: '#P44L998201', lane: 'Mutare → Harare', amount: 'USD 420', outcome: 'Delivered' },
-      { id: '2', code: '#Q88R112004', lane: 'Harare → Kadoma', amount: 'USD 310', outcome: 'Delivered' },
+      {
+        id: '1',
+        code: '#P44L998201',
+        companyName: 'Hello C Technologies',
+        deliveryDate: 'May 18, 2026',
+        route: 'Mutare → Harare',
+        amount: 'USD 420',
+        outcome: 'Delivered',
+      },
+      {
+        id: '2',
+        code: '#Q88R112004',
+        companyName: 'Hello C Technologies',
+        deliveryDate: 'May 16, 2026',
+        route: 'Harare → Kadoma',
+        amount: 'USD 310',
+        outcome: 'Delivered',
+      },
     ],
   },
   {
     title: 'April 2026',
     data: [
-      { id: '3', code: '#L09K883201', lane: 'Bulawayo → Plumtree', amount: 'USD 190', outcome: 'Delivered' },
-      { id: '4', code: '#C33M009221', lane: 'Masvingo → Harare', amount: '—', outcome: 'Cancelled' },
+      {
+        id: '3',
+        code: '#L09K883201',
+        companyName: 'Hello C Technologies',
+        deliveryDate: 'Apr 28, 2026',
+        route: 'Bulawayo → Plumtree',
+        amount: 'USD 190',
+        outcome: 'Delivered',
+      },
+      {
+        id: '4',
+        code: '#C33M009221',
+        companyName: 'Hello C Technologies',
+        deliveryDate: 'Apr 22, 2026',
+        route: 'Masvingo → Harare',
+        amount: '—',
+        outcome: 'Cancelled',
+      },
     ],
   },
 ];
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const { user } = useAuthUser();
+  const company = user?.company ?? 'Your company';
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 12 }]}>
@@ -33,7 +76,13 @@ export default function HistoryScreen() {
       <Text style={styles.sub}>Closed jobs stay here for your records and disputes window.</Text>
 
       <SectionList
-        sections={SECTIONS}
+        sections={SECTIONS.map((s) => ({
+          ...s,
+          data: s.data.map((item) => ({
+            ...item,
+            companyName: item.companyName || company,
+          })),
+        }))}
         keyExtractor={(i) => i.id}
         contentContainerStyle={{ paddingBottom: insets.bottom + 88 }}
         stickySectionHeadersEnabled={false}
@@ -41,33 +90,20 @@ export default function HistoryScreen() {
           <Text style={styles.section}>{title}</Text>
         )}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <View style={styles.iconWrap}>
-              <Feather name="package" size={20} color={TQ.gray600} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.code}>{item.code}</Text>
-              <Text style={styles.lane}>{item.lane}</Text>
-              <Text style={styles.amount}>{item.amount}</Text>
-            </View>
-            <View
-              style={[
-                styles.outcome,
-                item.outcome === 'Cancelled' && { backgroundColor: TQ.gray200 },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.outcomeText,
-                  item.outcome === 'Cancelled' && { color: TQ.gray600 },
-                ]}
-              >
-                {item.outcome}
-              </Text>
-            </View>
-          </View>
+          <ShipmentCard
+            boxWidth={64}
+            style={{ marginBottom: 10 }}
+            data={{
+              code: item.code,
+              companyName: item.companyName,
+              deliveryDate: item.deliveryDate,
+              route: item.route,
+              status: item.outcome,
+              amount: item.amount,
+            }}
+          />
         )}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
       />
     </View>
   );
@@ -101,51 +137,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: TQ.white,
-    borderRadius: TQRadii.lg,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: TQ.gray200,
-    gap: 12,
-  },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: TQ.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  code: {
-    fontFamily: TQFonts.bold,
-    fontSize: 16,
-    color: TQ.ink,
-  },
-  lane: {
-    marginTop: 2,
-    fontFamily: TQFonts.regular,
-    fontSize: 13,
-    color: TQ.gray600,
-  },
-  amount: {
-    marginTop: 4,
-    fontFamily: TQFonts.medium,
-    fontSize: 13,
-    color: TQ.gray500,
-  },
-  outcome: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: TQRadii.pill,
-    backgroundColor: TQ.greenSoft,
-  },
-  outcomeText: {
-    fontFamily: TQFonts.semiBold,
-    fontSize: 11,
-    color: TQ.green,
   },
 });

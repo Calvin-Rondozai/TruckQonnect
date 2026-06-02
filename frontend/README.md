@@ -2,7 +2,9 @@
 
 A mobile logistics app for Zimbabwe, inspired by inDrive-style freight matching. **Cargo owners** post loads and hire drivers; **truck owners** browse loads, place bids, and run active deliveries with live map tracking.
 
-This repository is a **UI-first prototype**: mock data, local state, and no backend API yet.
+The app connects to the **Django REST API** in `../backend` for auth, load posting (map coordinates + distance), and live tracking. See the [project readme](../readme.md) for architecture and setup.
+
+Some screens still use mock data (bids, sample history) while APIs are rolled out.
 
 ## Tech stack
 

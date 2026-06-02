@@ -187,7 +187,13 @@ export function LoadCard({
               </Text>
             </View>
             <Text style={styles.compactMeta} numberOfLines={1}>
-              {load.cargoType} · {load.weight}
+              {load.customerCompany}
+            </Text>
+            <Text style={styles.compactMeta} numberOfLines={1}>
+              Delivery · {load.deliveryDate}
+            </Text>
+            <Text style={styles.compactMeta} numberOfLines={1}>
+              {load.cargoType} · {load.weight} · {load.distance}
             </Text>
             <Text style={styles.compactBudget}>${load.budget}</Text>
           </View>
@@ -226,12 +232,12 @@ export function LoadCard({
           {load.dropoff}
         </Text>
       </View>
-      <View style={styles.loadMeta}>
-        <Text style={styles.loadMetaItem}>{load.cargoType}</Text>
-        <Text style={styles.loadMetaDot}>·</Text>
-        <Text style={styles.loadMetaItem}>{load.weight}</Text>
-        <Text style={styles.loadMetaDot}>·</Text>
-        <Text style={styles.loadMetaItem}>{load.distance}</Text>
+      <View style={styles.loadMetaBlock}>
+        <Text style={styles.loadMetaLine}>{load.customerCompany}</Text>
+        <Text style={styles.loadMetaLine}>Delivery · {load.deliveryDate}</Text>
+        <Text style={styles.loadMetaLine}>
+          {load.cargoType} · {load.weight} · {load.distance}
+        </Text>
       </View>
       <View style={styles.loadFooter}>
         <View>
@@ -421,6 +427,8 @@ const styles = StyleSheet.create({
   routeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: OW.yellow },
   routeDotEnd: { backgroundColor: OW.black },
   routeText: { flex: 1, fontFamily: TQFonts.semiBold, fontSize: 14, color: OW.black },
+  loadMetaBlock: { marginTop: 4, marginBottom: 12, gap: 4 },
+  loadMetaLine: { fontFamily: TQFonts.regular, fontSize: 12, color: OW.gray500, lineHeight: 17 },
   loadMeta: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4, marginBottom: 12 },
   loadMetaItem: { fontFamily: TQFonts.regular, fontSize: 12, color: OW.gray500 },
   loadMetaDot: { color: OW.gray400, marginHorizontal: 4 },

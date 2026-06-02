@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { LoadCard, OwnerScreen, StatusBadge } from '@/components/owner/OwnerUIKit';
+import { HomeAppBar } from '@/components/truckq/HomeAppBar';
 import { NotificationsPanel } from '@/components/truckq/NotificationsPanel';
 import { useAuthUser } from '@/context/auth-user';
 import { useOwnerActiveJob } from '@/context/owner-active-job';
 import { useOwnerProfile } from '@/context/owner-profile';
 import { OW, TQFonts, TQRadii } from '@/constants/owner-design';
-import { getTimeOfDayGreeting } from '@/lib/greeting';
 import { AVAILABLE_LOADS, OWNER_EARNINGS, OWNER_MOCK_NOTIFICATIONS } from '@/lib/owner-mock-data';
 
 export default function OwnerDashboard() {
@@ -20,8 +20,6 @@ export default function OwnerDashboard() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(OWNER_MOCK_NOTIFICATIONS);
 
-  const firstName = (user?.full_name ?? profile.name).split(' ')[0];
-  const greeting = getTimeOfDayGreeting();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -33,24 +31,13 @@ export default function OwnerDashboard() {
         onItemsChange={setNotifications}
       />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <View style={styles.top}>
-          <View style={styles.greetBlock}>
-            <Text style={styles.greet}>{greeting},</Text>
-            <Text style={styles.name}>{firstName} 👋</Text>
-          </View>
-          <Pressable
-            style={styles.notif}
-            accessibilityRole="button"
-            accessibilityLabel="Notifications"
-            onPress={() => setNotifOpen(true)}
-          >
-            <Feather name="bell" size={20} color={OW.black} />
-            {unreadCount > 0 ? (
-              <View style={styles.notifBadge}>
-                <Text style={styles.notifBadgeText}>{unreadCount}</Text>
-              </View>
-            ) : null}
-          </Pressable>
+        <View style={styles.topWrap}>
+          <HomeAppBar
+            variant="owner"
+            companyName={user?.company ?? profile.company}
+            unreadCount={unreadCount}
+            onNotificationsPress={() => setNotifOpen(true)}
+          />
         </View>
 
         <View style={styles.earnCard}>
@@ -128,45 +115,10 @@ export default function OwnerDashboard() {
 
 const styles = StyleSheet.create({
   scroll: { paddingBottom: 24 },
-  top: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  topWrap: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 12,
     paddingBottom: 4,
-  },
-  greetBlock: { flex: 1, paddingRight: 12 },
-  greet: { fontFamily: TQFonts.regular, fontSize: 14, color: OW.gray500 },
-  name: { fontFamily: TQFonts.bold, fontSize: 22, color: OW.black, marginTop: 2 },
-  notif: {
-    width: 48,
-    height: 48,
-    borderRadius: TQRadii.md,
-    backgroundColor: OW.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: OW.gray200,
-  },
-  notifBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: OW.yellow,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 1.5,
-    borderColor: OW.white,
-  },
-  notifBadgeText: {
-    fontFamily: TQFonts.bold,
-    fontSize: 10,
-    color: OW.black,
   },
   earnCard: {
     marginHorizontal: 20,

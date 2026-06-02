@@ -11,4 +11,10 @@ const defaultHost =
 
 export const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? defaultHost).replace(/\/$/, '');
 
-export const AUTH_API_PREFIX = `${API_BASE_URL}/api/v1/auth`;
+export const API_V1_PREFIX = `${API_BASE_URL}/api/v1`;
+
+export const AUTH_API_PREFIX = `${API_V1_PREFIX}/auth`;
+
+export function wsBaseUrl(): string {
+  return API_BASE_URL.replace(/^http/, 'ws');
+}

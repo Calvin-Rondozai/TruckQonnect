@@ -15,7 +15,10 @@ const KEY = '@truckq_posted_loads';
 type ContextValue = {
   loads: PostedLoad[];
   loaded: boolean;
-  postLoad: (draft: PlaceLoadDraft) => Promise<PostedLoad>;
+  postLoad: (
+    draft: PlaceLoadDraft,
+    meta?: { code?: string; shipmentLoadId?: string }
+  ) => Promise<PostedLoad>;
 };
 
 const PostedLoadsContext = createContext<ContextValue | null>(null);
@@ -47,10 +50,11 @@ export function PostedLoadsProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const postLoad = useCallback(
-    async (draft: PlaceLoadDraft) => {
+    async (draft: PlaceLoadDraft, meta?: { code?: string; shipmentLoadId?: string }) => {
       const entry: PostedLoad = {
         id: `load-${Date.now()}`,
-        code: makeCode(),
+        code: meta?.code ?? makeCode(),
+        shipmentLoadId: meta?.shipmentLoadId,
         ...draft,
         status: 'open',
         postedAt: new Date().toISOString(),

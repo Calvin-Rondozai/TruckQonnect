@@ -11,9 +11,11 @@ export type OwnerLoad = {
   suggestedPrice: number;
   currency: string;
   timePosted: string;
+  deliveryDate: string;
   description: string;
   images: string[];
   customerName: string;
+  customerCompany: string;
   customerPhone: string;
   customerAvatar?: string;
   customerRating: number;
@@ -48,6 +50,8 @@ export type OwnerHistoryItem = {
   dropoff: string;
   earnings: number;
   date: string;
+  deliveryDate: string;
+  customerCompany: string;
   customerRating: number;
   status: 'completed' | 'cancelled' | 'ongoing';
 };
@@ -73,6 +77,7 @@ export type OwnerChatMessage = {
 export type OwnerProfile = {
   id: string;
   name: string;
+  company: string;
   phone: string;
   avatar: string;
   rating: number;

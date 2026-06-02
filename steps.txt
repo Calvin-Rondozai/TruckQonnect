@@ -1,0 +1,8 @@
+daphne -b 0.0.0.0 -p 8000 config.asgi:application
+
+
+1.on the post load, the pickup and delivery location i must be able to pick them up from the map fro exact point to pic and deliver your goods
+2. on the app bar, the far left i want it to have the attached order for both sides the client and the trucker and just hello <name> and the company underneeth the name closely together
+3. on the client side us the box.png not a sign of a box but the real picture and resize it based on the card size.
+4. On the history page, as well as on all other shipment cards Put the company name and deliverydate on all cards and they should be well represebted like the bids cards.
+5. on the read me file in the parent folfer, put the project summary in there and the system architecture and make sure you update all files whenever you make changes

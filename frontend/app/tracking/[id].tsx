@@ -1,36 +1,30 @@
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
+  ActivityIndicator,
   Linking,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import MapView, { type MapStyleElement, Marker, Polyline } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { MapFallback } from '@/components/truckq/MapFallback';
-import { PackageStackIllustration } from '@/components/truckq/PackageStackIllustration';
+import { LoadTrackingMap } from '@/components/truckq/LoadTrackingMap';
+import { BoxImage } from '@/components/truckq/BoxImage';
 import { SwipeToShipSlider } from '@/components/truckq/SwipeToShipSlider';
 import { TQ, TQFonts, TQRadii } from '@/constants/truckq-design';
-import { lightMapStyle } from '@/lib/light-map-style';
+import { useLoadTracking } from '@/hooks/useLoadTracking';
+import { normalizeLoadId } from '@/lib/loads-api';
 
 const DRIVER_AVATAR =
   'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80';
 
-const ROUTE = {
-  pickup: { latitude: -17.8252, longitude: 31.0518 },
-  vehicle: { latitude: -17.893, longitude: 31.068 },
-  dropoff: { latitude: -17.9939, longitude: 31.0481 },
-};
-
-const REGION = {
+const FALLBACK_REGION = {
   latitude: -17.91,
   longitude: 31.055,
   latitudeDelta: 0.22,
@@ -42,11 +36,18 @@ export default function TrackingDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const displayId = useMemo(() => {
+  const loadId = useMemo(() => {
     const raw = Array.isArray(id) ? id[0] : id;
-    if (!raw) return '#—';
-    return raw.startsWith('#') ? raw : `#${raw}`;
+    return raw ? normalizeLoadId(raw) : '';
   }, [id]);
+
+  const { load, route, truck, region, loading, error } = useLoadTracking(loadId, true);
+
+  const displayId = useMemo(() => {
+    if (load?.load_id) return `#${load.load_id}`;
+    if (!loadId) return '#—';
+    return loadId.startsWith('#') ? loadId : `#${loadId}`;
+  }, [load, loadId]);
 
   const openDial = () => {
     void Linking.openURL('tel:+263771000000');
@@ -55,56 +56,32 @@ export default function TrackingDetailScreen() {
     void Haptics.selectionAsync();
   };
 
-  const mapStyle = useMemo((): MapStyleElement[] | undefined => {
-    if (Platform.OS !== 'android') return undefined;
-    return [...lightMapStyle] as unknown as MapStyleElement[];
-  }, []);
+  const mapRegion = region ?? FALLBACK_REGION;
+  const pickup = route?.pickup;
+  const destination = route?.destination;
+  const polyline = route?.route.polyline;
 
   return (
     <View style={styles.root}>
       <View style={styles.mapSlot}>
-        {Platform.OS === 'web' ? (
-          <MapFallback />
-        ) : (
-          <MapView
-            style={StyleSheet.absoluteFill}
-            initialRegion={REGION}
-            mapType={Platform.OS === 'ios' ? 'mutedStandard' : 'standard'}
-            customMapStyle={mapStyle}
-            rotateEnabled={false}
-            pitchEnabled={false}
-          >
-            <Polyline
-              coordinates={[ROUTE.pickup, ROUTE.vehicle]}
-              strokeColor={TQ.green}
-              strokeWidth={5}
-              lineCap="round"
-              lineJoin="round"
-            />
-            <Polyline
-              coordinates={[ROUTE.vehicle, ROUTE.dropoff]}
-              strokeColor={TQ.yellowDeep}
-              strokeWidth={5}
-              lineCap="round"
-              lineJoin="round"
-            />
-            <Marker coordinate={ROUTE.pickup} anchor={{ x: 0.5, y: 1 }}>
-              <View style={styles.markerPickup}>
-                <Ionicons name="navigate" size={18} color={TQ.white} />
-              </View>
-            </Marker>
-            <Marker coordinate={ROUTE.vehicle} anchor={{ x: 0.5, y: 0.5 }}>
-              <View style={styles.markerTruck}>
-                <MaterialCommunityIcons name="truck" size={20} color={TQ.black} />
-              </View>
-            </Marker>
-            <Marker coordinate={ROUTE.dropoff} anchor={{ x: 0.5, y: 1 }}>
-              <View style={styles.markerHome}>
-                <Feather name="home" size={18} color={TQ.black} />
-              </View>
-            </Marker>
-          </MapView>
-        )}
+        {loading && !route ? (
+          <View style={styles.mapLoading}>
+            <ActivityIndicator size="large" color={TQ.yellowDeep} />
+          </View>
+        ) : error && !route ? (
+          <View style={styles.mapLoading}>
+            <Text style={styles.mapError}>{error}</Text>
+          </View>
+        ) : pickup && destination ? (
+          <LoadTrackingMap
+            fullScreen
+            pickup={pickup}
+            destination={destination}
+            truck={truck}
+            routePolyline={polyline}
+            region={mapRegion}
+          />
+        ) : null}
       </View>
 
       <LinearGradient
@@ -146,7 +123,9 @@ export default function TrackingDetailScreen() {
 
         <View style={styles.metaRow}>
           <Text style={styles.metaId}>{displayId}</Text>
-          <Text style={styles.metaDate}>May 20 · ETA 15:10</Text>
+          <Text style={styles.metaDate}>
+            {load?.status ? load.status.replace(/_/g, ' ') : 'Live tracking'}
+          </Text>
         </View>
 
         <View style={styles.timelineWrap}>
@@ -157,12 +136,12 @@ export default function TrackingDetailScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.tLabel}>Pickup</Text>
-            <Text style={styles.tVal}>11 Josiah Chinamano Ave, Harare</Text>
+            <Text style={styles.tVal}>{load?.pickup_address ?? '—'}</Text>
             <View style={{ height: 16 }} />
             <Text style={styles.tLabel}>Deliver to</Text>
-            <Text style={styles.tVal}>Unit 4 · Zengeza 2, Chitungwiza</Text>
+            <Text style={styles.tVal}>{load?.destination_address ?? '—'}</Text>
           </View>
-          <PackageStackIllustration />
+          <BoxImage width={56} />
         </View>
 
         <SwipeToShipSlider
@@ -171,7 +150,7 @@ export default function TrackingDetailScreen() {
             void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             router.push({
               pathname: '/delivery-done/[id]',
-              params: { id: displayId.replace('#', '') },
+              params: { id: (load?.load_id ?? loadId).replace('#', '') },
             });
           }}
         />
@@ -187,6 +166,19 @@ const styles = StyleSheet.create({
   },
   mapSlot: {
     ...StyleSheet.absoluteFillObject,
+  },
+  mapLoading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: TQ.gray100,
+    padding: 24,
+  },
+  mapError: {
+    fontFamily: TQFonts.medium,
+    fontSize: 14,
+    color: TQ.gray500,
+    textAlign: 'center',
   },
   headerFade: {
     position: 'absolute',
@@ -298,6 +290,7 @@ const styles = StyleSheet.create({
     fontFamily: TQFonts.medium,
     fontSize: 13,
     color: TQ.gray500,
+    textTransform: 'capitalize',
   },
   timelineWrap: {
     flexDirection: 'row',
@@ -348,50 +341,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: TQ.ink,
     lineHeight: 20,
-  },
-  markerPickup: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: TQ.green,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: TQ.white,
-    shadowColor: TQ.black,
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
-  },
-  markerTruck: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: TQ.yellow,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: TQ.black,
-    shadowColor: TQ.black,
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-  markerHome: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: TQ.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: TQ.black,
-    shadowColor: TQ.black,
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
   },
 });

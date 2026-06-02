@@ -1,4 +1,4 @@
-import { AUTH_API_PREFIX } from '@/lib/api-config';
+import { API_V1_PREFIX, AUTH_API_PREFIX } from '@/lib/api-config';
 import { getAccessToken } from '@/lib/auth-storage';
 import { ApiError } from '@/lib/auth-api';
 
@@ -11,9 +11,9 @@ export async function authHeaders(): Promise<Record<string, string>> {
   return headers;
 }
 
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const headers = await authHeaders();
-  const res = await fetch(`${AUTH_API_PREFIX}${path}`, {
+  const res = await fetch(url, {
     ...init,
     headers: {
       ...headers,
@@ -34,4 +34,12 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     throw new ApiError(message);
   }
   return body as T;
+}
+
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return request<T>(`${AUTH_API_PREFIX}${path}`, init);
+}
+
+export async function apiV1Fetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return request<T>(`${API_V1_PREFIX}${path}`, init);
 }

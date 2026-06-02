@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PackageStackIllustration } from '@/components/truckq/PackageStackIllustration';
+import { ShipmentCard } from '@/components/truckq/ShipmentCard';
 import { ProgressWithTruck } from '@/components/truckq/ProgressWithTruck';
 import { DRIVERS, SHIPMENTS } from '@/lib/mock-data';
 import { TQ, TQFonts, TQRadii } from '@/constants/truckq-design';
@@ -28,6 +28,7 @@ export default function TrackTabScreen() {
       (r) =>
         r.code.toLowerCase().includes(s) ||
         r.from.toLowerCase().includes(s) ||
+        r.companyName.toLowerCase().includes(s) ||
         DRIVERS[r.driverId]?.name.toLowerCase().includes(s),
     );
   }, [q]);
@@ -63,33 +64,24 @@ export default function TrackTabScreen() {
         renderItem={({ item }) => {
           const driver = DRIVERS[item.driverId];
           return (
-            <Pressable
-              style={({ pressed }) => [styles.card, pressed && { opacity: 0.94 }]}
+            <ShipmentCard
+              boxWidth={68}
+              data={{
+                code: item.code,
+                companyName: item.companyName,
+                deliveryDate: item.deliveryDate,
+                route: `${item.from} → ${item.to}`,
+                status: 'In transit',
+                subtitle: driver ? `Driver · ${driver.name}` : undefined,
+              }}
               onPress={() =>
                 router.push({
                   pathname: '/driver/[id]',
                   params: { id: item.code.replace('#', '') },
                 })
               }
-            >
-              <View style={styles.cardTop}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.code}>{item.code}</Text>
-                  <Text style={styles.route}>
-                    {item.from} → {item.to}
-                  </Text>
-                  {driver ? (
-                    <View style={styles.driverRow}>
-                      <Feather name="user" size={13} color={TQ.gray500} />
-                      <Text style={styles.driverName}>{driver.name}</Text>
-                    </View>
-                  ) : null}
-                  <Text style={styles.eta}>{item.eta}</Text>
-                </View>
-                <PackageStackIllustration size="sm" />
-              </View>
-              <ProgressWithTruck progress={item.progress} />
-            </Pressable>
+              footer={<ProgressWithTruck progress={item.progress} />}
+            />
           );
         }}
         ListEmptyComponent={
@@ -118,15 +110,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: TQ.gray600,
-    marginBottom: 18,
+    marginBottom: 14,
   },
   search: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: TQ.white,
     borderRadius: TQRadii.lg,
-    paddingHorizontal: 14,
-    height: 50,
+    paddingHorizontal: 16,
+    height: 52,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: TQ.gray200,
   },
@@ -137,54 +130,10 @@ const styles = StyleSheet.create({
     color: TQ.ink,
     paddingVertical: 0,
   },
-  card: {
-    backgroundColor: TQ.white,
-    borderRadius: TQRadii.lg,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: TQ.gray200,
-    shadowColor: TQ.black,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  cardTop: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  code: {
-    fontFamily: TQFonts.bold,
-    fontSize: 17,
-    color: TQ.ink,
-  },
-  route: {
-    marginTop: 6,
-    fontFamily: TQFonts.medium,
-    fontSize: 14,
-    color: TQ.gray600,
-  },
-  driverRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-  },
-  driverName: {
-    fontFamily: TQFonts.semiBold,
-    fontSize: 13,
-    color: TQ.gray700,
-  },
-  eta: {
-    marginTop: 4,
-    fontFamily: TQFonts.regular,
-    fontSize: 13,
-    color: TQ.gray500,
-  },
   empty: {
     textAlign: 'center',
-    marginTop: 40,
-    fontFamily: TQFonts.medium,
+    marginTop: 32,
+    fontFamily: TQFonts.regular,
     fontSize: 14,
     color: TQ.gray500,
   },

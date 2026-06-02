@@ -23,6 +23,8 @@ export type DriverProfile = {
 export type ShipmentTrack = {
   id: string;
   code: string;
+  companyName: string;
+  deliveryDate: string;
   from: string;
   to: string;
   eta: string;
@@ -45,6 +47,8 @@ export type LoadRequest = {
 export type PostedLoad = {
   id: string;
   code: string;
+  /** Backend shipment reference (e.g. TQ123456) for live map tracking */
+  shipmentLoadId?: string;
   pickup: string;
   delivery: string;
   description: string;
@@ -64,4 +68,5 @@ export type PlaceLoadDraft = {
   truckType: string;
   budget: string;
   pickupWhen: string;
+  distanceKm?: number;
 };

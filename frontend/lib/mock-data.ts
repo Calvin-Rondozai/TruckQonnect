@@ -49,6 +49,8 @@ export const SHIPMENTS: ShipmentTrack[] = [
   {
     id: 'a',
     code: '#H62J568107',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 20, 2026',
     from: 'Harare CBD',
     to: 'Chitungwiza',
     eta: 'Today · 14:20',
@@ -58,6 +60,8 @@ export const SHIPMENTS: ShipmentTrack[] = [
   {
     id: 'b',
     code: '#K91M220441',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 21, 2026',
     from: 'Bulawayo',
     to: 'Gwanda',
     eta: 'Tomorrow · 09:00',
@@ -67,6 +71,8 @@ export const SHIPMENTS: ShipmentTrack[] = [
   {
     id: 'c',
     code: '#M77P003812',
+    companyName: 'Hello C Technologies',
+    deliveryDate: 'May 22, 2026',
     from: 'Mutare',
     to: 'Rusape',
     eta: 'May 21 · 11:40',
